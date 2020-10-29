@@ -1,0 +1,202 @@
+\documentclass[12pt, letterpaper, twoside]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\begin{document}
+\title{IN2090 Oblig 3}
+\author{Espen Lønes}
+\date{\today}
+\maketitle
+\ \\
+Oppgave 1)\\
+\begin{verbatim}
+CREATE TABLE Tog (
+  togNr int PRIMARY KEY,
+  startStasjon text NOT NULL,
+  endeStasjon text NOT NULL,
+  ankomstTid time(0) NOT NULL
+);
+
+CREATE TABLE TogTabell (
+  togNr int REFERENCES Tog (togNr), 
+  avgangsTid time(0) NOT NULL, 
+  stasjon text NOT NULL,
+  CONSTRAINT tog_tabell_pk PRIMARY KEY (togNr, avgangsTid)
+);
+
+CREATE TABLE Plass (
+  dato date, 
+  togNr int REFERENCES Tog (togNr), 
+  vognNr int,
+  plassNr int,
+  vindu boolean NOT NULL,
+  ledig boolean NOT NULL,
+  CONSTRAINT plass_pk PRIMARY KEY (dato, togNr, vognNr, plassNr)
+);
+\end{verbatim}
+\newpage
+\ \\
+Oppgave 2)\\
+\ \\
+a)\\
+\\
+Vi har:
+\begin{verbatim}
+R(A,B,C,D,E,F,G)
+1. CDE -> B
+2.  AF -> B
+3.   B -> A
+4. BCF -> DE
+5.   D -> G
+\end{verbatim}
+Finner kandidatnøkkler.\\
+Må inneholde de som kun er på venstre sider av FD-er. Dette er C og F.\\
+Kan ikke inneholde de som er kun høyre sider av FD-er. Dette er G.\\
+Ved å prøve med alle mulige kombinasjoner av CF og de resterende atributter (ABDE). Fant jeg disse kandidatnøkklene.
+\begin{verbatim}
+{C,F,A}
+{C,F,B}
+{C,F,D,E}
+\end{verbatim}
+b)\\ 
+\ \\
+Den høyeste normalformen som R tilfrestiller er den høyeste normalformen som alle FD-ene til R tilfrestiller. Finner da normalformene til FD-ene.
+\begin{verbatim}
+R(A,B,C,D,E,F,G)
+1. CDE -> B   3NF 
+2.  AF -> B   3NF
+3.   B -> A   3NF
+4. BCF -> DE  BCNF
+5.   D -> G   1NF
+\end{verbatim}
+\newpage
+\ \\
+1. Fordi CDE ikke er en supernøkkel men B er en nøkkelattributt.\\
+2. Fordi AF ikke er en supernøkkel men B er en nøkkelattributt.\\
+3. Fordi B ikke er en supernøkkel men A er en nøkkelattributt.\\
+4. Fordi BCF er en supernøkkel.\\
+5. Fordi D ikke er en supernøkkel, G er ikke en nøkkelattributt og D er en del av en kandidatnøkkel.\\
+\\
+Så R er på 1NF.\\
+\ \\
+c)\\
+\ \\
+Så vi har:
+\begin{verbatim}
+R(A,B,C,D,E,F,G)
+FD-er:
+1. CDE -> B
+2.  AF -> B 
+3.   B -> A   
+4. BCF -> DE 
+5.   D -> G 
+Kandidatnøkler:
+{A,C,F}
+{B,C,F}
+{C,D,E,F}
+\end{verbatim}
+Som vi vet fra oppgave b) så bryter FD 1 med BCNF. Dekomponerer da R til;
+$$
+S_1((CDE)^+) = S_1(A,B,C,D,E,G)
+$$
+og
+$$
+S_2((CDE),ABCDEFG/(CDE)^+) = S_2(C,D,E,F)
+$$
+\ \\
+Ser så videre på de to komponentene. Der jeg ser på $S_1$ først. 
+\newpage
+\ \\
+\begin{verbatim}
+S_1(A,B,C,D,E,G)
+FD-er:
+1. CDE -> B
+2.   B -> A
+3.   D -> G
+Kandidatnøkler:
+{C,D,E}
+\end{verbatim}
+\ \\
+1. FD er på BCNF fordi CDE er en supernøkkel.\\
+Men 2. FD er ikke det fordi B ikke er en supernøkkel.\\
+Så vi dekomponerer $S_1$, som gir:\\
+$$
+S_{11}(B^+) = S_{11}(A,B)
+$$
+og
+$$
+S_{12}(B,(ABCDEG)/B^+) = S_{12}(B,C,D,E,G)
+$$
+\ \\
+Ser så på $S_{11}$
+\begin{verbatim}
+S_11(A,B)
+FD-er:
+1.   B -> A
+Kandidatnøkler:
+{B}
+\end{verbatim}
+FD-en tilfredstiller BCNF så vi trenger ikke dekomponere $S_{11}$
+\newpage
+\ \\
+Ser så på $S_{12}$\\
+\begin{verbatim}
+S_12(B,C,D,E,G)
+FD-er:
+1. CDE -> B
+2.   D -> G
+Kandidatnøkler:
+{C,D,E}
+\end{verbatim}
+1. FD er på BCNF siden CDE er en supernøkkel.\\
+Men 2. FD er ikkedet siden D ikke er en supernøkkel.\\
+Dekomponerer da $S_{12}$:
+$$
+S_{121}(D^+) = S_{121}(D,G)
+$$
+og
+$$
+S_{122}(D,(BCDEG)/B^+) = S_{122}(B,C,D,E)
+$$
+Ser på $S_{121}$.
+\begin{verbatim}
+S_121(D,G)
+FD-er:
+1.   D -> G
+Kandidatnøkler:
+{D}
+\end{verbatim}
+D er en supernøkkel så FD-en er på BCNF og $S_{121}$ trenger ikke dekomponeres videre.\\
+\ \\
+Ser på $S_{122}$.
+\begin{verbatim}
+S_122(B,C,D,E)
+FD-er:
+1. CDE -> B
+Kandidatnøkler:
+{C,D,E}
+\end{verbatim}
+CDE er en supernøkkel så FD-en er på BCNF og $S_{122}$ trenger ikke dekomponeres videre.
+\newpage
+\ \\
+Så må vi tilbake og se på $S_2$
+\begin{verbatim}
+S_2(C,D,E,F)
+FD-er:
+
+Kandidatnøkler:
+
+\end{verbatim}
+$S_2$ har ingen FD-er og er dermed på BCNF og trenger ikke dekomponeres.\\
+\ \\
+Oppsumert får vi da at
+\begin{verbatim}
+R(A,B,C,D,E,F,G)
+\end{verbatim}
+Dekomponeres til:
+\begin{verbatim}
+S_11(A,B)
+S_121(D,G)
+S_122(B,C,D,E)
+S_2(C,D,E,F)
+\end{verbatim}
+\end{document}

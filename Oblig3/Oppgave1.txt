@@ -1,0 +1,23 @@
+CREATE TABLE Tog (
+  togNr int PRIMARY KEY,
+  startStasjon text NOT NULL,
+  endeStasjon text NOT NULL,
+  ankomstTid time(0) NOT NULL
+);
+
+CREATE TABLE TogTabell (
+  togNr int REFERENCES Tog (togNr), 
+  avgangsTid time(0) NOT NULL, 
+  stasjon text NOT NULL,
+  CONSTRAINT tog_tabell_pk PRIMARY KEY (togNr, avgangsTid)
+);
+
+CREATE TABLE Plass (
+  dato date, 
+  togNr int REFERENCES Tog (togNr), 
+  vognNr int,
+  plassNr int,
+  vindu boolean NOT NULL,
+  ledig boolean NOT NULL,
+  CONSTRAINT plass_pk PRIMARY KEY (dato, togNr, vognNr, plassNr)
+);
